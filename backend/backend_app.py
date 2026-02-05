@@ -41,6 +41,26 @@ def add_post():
     POSTS.append(new_post)
     return jsonify(new_post), 201
 
+
+@app.route('/api/posts/search', methods=['GET'])
+def search_posts():
+    title_q = (request.args.get("title") or "").strip().lower()
+    content_q = (request.args.get("content") or "").strip().lower()
+
+    results = []
+    for post in POSTS:
+        title_text = (post.get("title") or "").lower()
+        content_text = (post.get("content") or "").lower()
+
+        title_ok = True if not title_q else (title_q in title_text)
+        content_ok = True if not content_q else (content_q in content_text)
+
+        if title_ok and content_ok:
+            results.append(post)
+
+    return jsonify(results), 200
+
+
 @app.route('/api/posts/<int:post_id>', methods=['DELETE'])
 def delete_post(post_id):
     for i, post in enumerate(POSTS):
